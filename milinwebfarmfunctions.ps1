@@ -588,7 +588,6 @@ function Configure-WebServer {
         }
     Install-WindowsFeature -name $windowsFeatureSet
 
-
     ### Create User Accounts
 
     # Create milinazurestorage Local User Account
@@ -604,15 +603,16 @@ function Configure-WebServer {
 
     Add-LocalGroupMember -Group "IIS_IUSRS" -Member $localUser, "IUSR"
 
-    ### Add key to vault
+    # Open TCP Port 445
+    # https://forum.sysinternals.com/psexec-cannot-execute-check-admin-share_topic21738.html
 
     New-NetFirewallRule -DisplayName "Allow SMB" -Direction Inbound -Action Allow -LocalPort 445 -Protocol TCP
 
-    # Open TCP Port 445
-    # https://forum.sysinternals.com/psexec-cannot-execute-check-admin-share_topic21738.html
-    exit
+    ###>>> exit <<<### Need to Check !!!
 
     Start-Sleep s 120
+
+    ### Add key to vault
 
     $argumentList = '-accepteula -u $domainUser -p $domainPassword -h \\' + $hostName + ' c:\windows\system32\cmd.exe /c cmdkey /add:' + $IISStorageLocation + ' /user:' + $storageAccountName + ' /pass:' + $storageAccountPassword
     Start-Process `
